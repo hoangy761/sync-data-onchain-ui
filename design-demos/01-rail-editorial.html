@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Indexer — Direction A · Rail Editorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f7f8f6;
+      --paper: #ffffff;
+      --ink: #12141a;
+      --muted: #5c6570;
+      --line: #e2e6e3;
+      --accent: #0f766e; /* ink teal — confirmed */
+      --accent-soft: #e6f4f2;
+      --warn: #b45309;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      border-right: 1px solid var(--line);
+      background: var(--paper);
+      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .brand {
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      font-size: 20px;
+    }
+    .brand span { color: var(--accent); }
+    nav a {
+      display: block;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 8px 0;
+      border-bottom: 1px solid transparent;
+    }
+    nav a.active, nav a:hover { color: var(--ink); }
+    nav a.active { border-bottom-color: var(--accent); }
+    .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+    .tag {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    main { padding: 36px 48px 64px; max-width: 980px; }
+    h1 {
+      font-size: clamp(28px, 3vw, 36px);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      margin: 0 0 8px;
+    }
+    .lede { color: var(--muted); margin: 0 0 28px; font-size: 15px; line-height: 1.55; max-width: 42rem; }
+    .lookup {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+    }
+    .row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center; }
+    label { font-size: 12px; color: var(--muted); }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      padding: 10px 12px;
+      font: inherit;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+    }
+    button {
+      justify-self: start;
+      background: var(--ink);
+      color: #fff;
+      border: 0;
+      padding: 10px 18px;
+      font: inherit;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    button:hover { background: var(--accent); }
+    .grid2 {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      padding: 18px 20px;
+    }
+    .panel h2 { margin: 0 0 12px; font-size: 13px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .big { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+    .meta { margin-top: 8px; font-size: 12px; color: var(--muted); }
+    .pill {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 2px 8px;
+      font-size: 12px;
+      font-family: "IBM Plex Mono", monospace;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 13px; }
+    th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .pos { color: var(--accent); }
+    .neg { color: var(--warn); }
+    footer.note {
+      margin-top: 40px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand">Index<span>er</span></div>
+      <div>
+        <div class="tag">Sections</div>
+        <nav>
+          <a class="active" href="#">01 · Lookup</a>
+          <a href="#">02 · Sync</a>
+          <a href="#">03 · Tokens</a>
+          <a href="#">04 · Chains</a>
+        </nav>
+      </div>
+      <div style="margin-top:auto">
+        <div class="tag">Network</div>
+        <div class="mono" style="font-size:12px;margin-top:8px;line-height:1.6">
+          HyperEVM<br />chain_id 999<br /><span class="pill">live</span>
+        </div>
+      </div>
+    </aside>
+    <main>
+      <h1>Holder balance ledger</h1>
+      <p class="lede">Paper-light explorer for indexed ERC-20 balances. Paste a holder address to read current balance and Transfer history from the Nest API.</p>
+
+      <div class="lookup">
+        <div class="row">
+          <label>Token</label>
+          <select><option>NEST · 0x07c57e…4e3035</option></select>
+        </div>
+        <div class="row">
+          <label>Holder</label>
+          <input class="mono" value="0xca58a9de93ba76457768b4782d60c015a977fb97" />
+        </div>
+        <button type="button">Look up balance</button>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <h2>Current balance</h2>
+          <div class="big mono">1,247.552 NEST</div>
+          <div class="meta mono">raw 1247552000000000000000 · decimals 18</div>
+        </div>
+        <div class="panel">
+          <h2>Sync status</h2>
+          <div class="big mono">lag 612,401</div>
+          <div class="meta mono">last 47,481,972 · safe head 48,094,373</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Block</th><th>Time</th><th>Tx</th><th>Delta</th><th>After</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">47481673</td>
+            <td>2026-10-02 16:50</td>
+            <td class="mono">0x4a4d…7d7e</td>
+            <td class="mono pos">+13.690</td>
+            <td class="mono">13.690</td>
+          </tr>
+          <tr>
+            <td class="mono">47481673</td>
+            <td>2026-10-02 16:50</td>
+            <td class="mono">0x4a4d…7d7e</td>
+            <td class="mono neg">−0.068</td>
+            <td class="mono">13.622</td>
+          </tr>
+          <tr>
+            <td class="mono">47481501</td>
+            <td>2026-10-02 16:41</td>
+            <td class="mono">0x0fe5…dae4</td>
+            <td class="mono pos">+420.000</td>
+            <td class="mono">420.000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <footer class="note">
+        Direction A · Logic 🎲 Rail Editorial (web #11 Dark Editorial structure → light paper + teal ink). Sticky numbered rail + ledger tables.
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
