@@ -2,15 +2,17 @@ import { useEffect, useState } from 'react';
 import { api, type ChainDto, type TokenDto } from './lib/api';
 import { useChainTokenSelection } from './lib/useChainTokenSelection';
 import { ChainsView } from './views/ChainsView';
+import { HoldersView } from './views/HoldersView';
 import { LookupView } from './views/LookupView';
 import { SyncView } from './views/SyncView';
 import { TokensView } from './views/TokensView';
 
-type Page = 'lookup' | 'tokens' | 'chains' | 'sync';
+type Page = 'lookup' | 'tokens' | 'holders' | 'chains' | 'sync';
 
 const NAV: Array<{ id: Page; label: string }> = [
   { id: 'lookup', label: 'Home' },
   { id: 'tokens', label: 'Tokens' },
+  { id: 'holders', label: 'Holders' },
   { id: 'chains', label: 'Chains' },
   { id: 'sync', label: 'Sync' },
 ];
@@ -91,6 +93,7 @@ export default function App() {
 
       {page === 'lookup' && <LookupView selection={selection} />}
       {page === 'tokens' && <TokensView selection={selection} />}
+      {page === 'holders' && <HoldersView selection={selection} />}
       {page === 'chains' && <ChainsView />}
       {page === 'sync' && <SyncView selection={selection} />}
     </div>

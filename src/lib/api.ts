@@ -55,6 +55,23 @@ export interface HistoryDto {
   message: string | null;
 }
 
+export interface TopHolderItem {
+  rank: number;
+  holderAddress: string;
+  balanceRaw: string;
+  balanceFormatted: string;
+  updatedBlock: string;
+}
+
+export interface TopHoldersDto {
+  chainId: number;
+  tokenAddress: string;
+  symbol: string | null;
+  decimals: number;
+  limit: number;
+  holders: TopHolderItem[];
+}
+
 export interface SyncStatusDto {
   chainId: number;
   tokenAddress: string;
@@ -105,4 +122,6 @@ export const api = {
   },
   getSyncStatus: (chainId: number, tokenAddress: string) =>
     getJson<SyncStatusDto>(`/api/v1/tokens/${chainId}/${tokenAddress}/sync-status`),
+  getTopHolders: (chainId: number, tokenAddress: string) =>
+    getJson<TopHoldersDto>(`/api/v1/tokens/${chainId}/${tokenAddress}/top-holders`),
 };
