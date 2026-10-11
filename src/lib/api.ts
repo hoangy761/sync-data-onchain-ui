@@ -66,6 +66,7 @@ export interface SyncStatusDto {
   latestBlock: string | null;
   safeHead: string | null;
   lagBlocks: string | null;
+  syncPercent: string | null;
   updatedAt: string;
 }
 

@@ -41,6 +41,24 @@ export function relativeAge(iso: string): string {
   return `${Math.floor(hours / 24)} days ago`;
 }
 
+export function formatBlock(value: string | null | undefined): string {
+  if (!value) return '—';
+  try {
+    return BigInt(value).toLocaleString('en-US');
+  } catch {
+    return value;
+  }
+}
+
+export function formatPercent(value: string | null | undefined): string {
+  if (value == null || value === '') return '—';
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return '—';
+  if (amount >= 100) return '100%';
+  if (amount <= 0) return '0%';
+  return amount >= 10 ? `${amount.toFixed(1)}%` : `${amount.toFixed(2)}%`;
+}
+
 export function formatTimestamp(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ChainSelect, TokenSelect } from '../components/ChainTokenSelects';
 import { Alert, Badge, Card, Kv } from '../components/ui';
 import { api, type SyncStatusDto } from '../lib/api';
-import { formatTimestamp, shorten } from '../lib/format';
+import { formatBlock, formatPercent, formatTimestamp, shorten } from '../lib/format';
 import type { ChainTokenSelection } from '../lib/useChainTokenSelection';
 
 export function SyncView({ selection }: { selection: ChainTokenSelection }) {
@@ -40,6 +40,16 @@ export function SyncView({ selection }: { selection: ChainTokenSelection }) {
 
   const lag = status?.lagBlocks;
   const caughtUp = lag === '0';
+  const percentLabel = formatPercent(status?.syncPercent ?? null);
+  const badgeText =
+    percentLabel !== '—'
+      ? `${percentLabel} synced`
+      : caughtUp
+        ? 'Caught up'
+        : lag
+          ? `Lag ${lag} blocks`
+          : 'Chain head unavailable';
+  const badgeTone = caughtUp ? 'ok' : percentLabel === '—' ? 'muted' : 'bad';
 
   return (
     <div className="mx-auto max-w-[1100px] px-6 pb-16 pt-8">
@@ -59,12 +69,14 @@ export function SyncView({ selection }: { selection: ChainTokenSelection }) {
       {status && (
         <Card
           title={`${status.symbol ?? 'Token'} checkpoint`}
-          badge={
-            <Badge tone={caughtUp ? 'ok' : 'bad'}>
-              {caughtUp ? 'Caught up' : `Lag ${lag} blocks`}
-            </Badge>
-          }
+          badge={<Badge tone={badgeTone}>{badgeText}</Badge>}
         >
+          <SyncRange
+            startBlock={status.deploymentBlock}
+            lastProcessedBlock={status.lastProcessedBlock}
+            currentBlock={status.latestBlock}
+            syncPercent={status.syncPercent}
+          />
           <Kv
             rows={[
               [
@@ -89,7 +101,7 @@ export function SyncView({ selection }: { selection: ChainTokenSelection }) {
                 </span>,
               ],
               [
-                'Latest block',
+                'Chain head',
                 <span className="font-mono text-[13px]">{status.latestBlock ?? '—'}</span>,
               ],
               [
@@ -108,8 +120,73 @@ export function SyncView({ selection }: { selection: ChainTokenSelection }) {
         </Card>
       )}
       <p className="text-xs text-muted">
-        Safe head is latest minus confirmation depth. Checkpoint advances only after a committed batch.
+        Safe head is chain head minus confirmation depth. Checkpoint advances only after a committed batch.
+        Percent is the share of blocks from the start block through the chain head that are already processed.
       </p>
+    </div>
+  );
+}
+
+function SyncRange({
+  startBlock,
+  lastProcessedBlock,
+  currentBlock,
+  syncPercent,
+}: {
+  startBlock: string;
+  lastProcessedBlock: string;
+  currentBlock: string | null;
+  syncPercent: string | null;
+}) {
+  const amount = syncPercent == null ? null : Number(syncPercent);
+  const width = amount == null || !Number.isFinite(amount) ? 0 : Math.min(100, Math.max(0, amount));
+  const label = formatPercent(syncPercent);
+  const marker = Math.min(78, Math.max(22, width));
+
+  return (
+    <div className="border-b border-line px-[18px] py-4">
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <span className="text-sm text-muted">Range</span>
+        <span className="font-mono text-lg font-semibold tabular-nums">{label}</span>
+      </div>
+      <div
+        className="relative h-3 rounded-full bg-slate-200"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={amount == null ? undefined : Math.round(width)}
+        aria-label="Sync progress from start block to chain head"
+      >
+        <div
+          className="h-full rounded-full bg-ok transition-[width] duration-500"
+          style={{ width: `${width}%` }}
+        />
+        {amount != null && (
+          <span
+            className="absolute top-1/2 h-5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink"
+            style={{ left: `${width}%` }}
+          />
+        )}
+      </div>
+      <div className="relative mt-3 h-10 text-[12px]">
+        <div className="absolute left-0 text-left">
+          <div className="text-muted">Start</div>
+          <div className="mt-0.5 font-mono text-[13px]">{formatBlock(startBlock)}</div>
+        </div>
+        {amount != null && (
+          <div
+            className="absolute -translate-x-1/2 text-center"
+            style={{ left: `${marker}%` }}
+          >
+            <div className="text-muted">Last processed</div>
+            <div className="mt-0.5 font-mono text-[13px]">{formatBlock(lastProcessedBlock)}</div>
+          </div>
+        )}
+        <div className="absolute right-0 text-right">
+          <div className="text-muted">Chain head</div>
+          <div className="mt-0.5 font-mono text-[13px]">{formatBlock(currentBlock)}</div>
+        </div>
+      </div>
     </div>
   );
 }
