@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { ChainSelect, TokenSelect } from "../components/ChainTokenSelects";
+import { CopyText } from "../components/CopyText";
 import { Alert, Badge, Card, Kv } from "../components/ui";
 import { api, type BalanceDto, type HistoryItem } from "../lib/api";
 import {
@@ -7,7 +8,6 @@ import {
   formatRaw,
   formatTimestamp,
   relativeAge,
-  shorten,
 } from "../lib/format";
 import type { ChainTokenSelection } from "../lib/useChainTokenSelection";
 
@@ -125,17 +125,20 @@ export function LookupView({ selection }: { selection: ChainTokenSelection }) {
               rows={[
                 [
                   "Holder",
-                  <span className="font-mono text-[13px] text-link">
-                    {balance.holderAddress}
-                  </span>,
+                  <CopyText value={balance.holderAddress} className="text-[13px]" />,
                 ],
                 [
                   "Token",
                   <>
                     {symbol}{" "}
-                    <span className="font-mono text-[13px] text-muted">
-                      ({shorten(balance.tokenAddress, 10, 4)})
-                    </span>
+                    (
+                    <CopyText
+                      value={balance.tokenAddress}
+                      left={10}
+                      right={4}
+                      className="text-[13px]"
+                    />
+                    )
                   </>,
                 ],
                 [
@@ -203,8 +206,8 @@ export function LookupView({ selection }: { selection: ChainTokenSelection }) {
                             {formatTimestamp(item.timestamp)}
                           </div>
                         </td>
-                        <td className="font-mono px-4 py-3 text-link">
-                          {shorten(item.txHash, 10, 6)}
+                        <td className="px-4 py-3">
+                          <CopyText value={item.txHash} left={10} right={6} />
                         </td>
                         <td className="font-mono px-4 py-3">{item.logIndex}</td>
                         <td

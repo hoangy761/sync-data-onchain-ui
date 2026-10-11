@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { ChainSelect, TokenSelect } from '../components/ChainTokenSelects';
+import { CopyText } from '../components/CopyText';
 import { Alert } from '../components/ui';
 import { api, type TopHoldersDto } from '../lib/api';
-import { formatRaw, shorten } from '../lib/format';
+import { formatRaw } from '../lib/format';
 import type { ChainTokenSelection } from '../lib/useChainTokenSelection';
 
 export function HoldersView({ selection }: { selection: ChainTokenSelection }) {
   const { selected, chain } = selection;
   const [data, setData] = useState<TopHoldersDto | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState<string | null>(null);
   const chainLabel = chain ? `${chain.name} · ${chain.chainId}` : null;
   const symbol = data?.symbol ?? selected?.symbol ?? 'TOKEN';
 
@@ -39,13 +39,6 @@ export function HoldersView({ selection }: { selection: ChainTokenSelection }) {
       window.clearInterval(timer);
     };
   }, [selected]);
-
-  async function copyAddress(address: string) {
-    const copiedOk = await writeClipboard(address);
-    if (!copiedOk) return;
-    setCopied(address);
-    window.setTimeout(() => setCopied((current) => (current === address ? null : current)), 1200);
-  }
 
   return (
     <div className="mx-auto max-w-[1100px] px-6 pb-16 pt-8">
@@ -90,16 +83,7 @@ export function HoldersView({ selection }: { selection: ChainTokenSelection }) {
                   <tr key={holder.holderAddress} className="border-t border-line">
                     <td className="px-4 py-3 text-muted tabular-nums">{holder.rank}</td>
                     <td className="px-4 py-3">
-                      <button
-                        type="button"
-                        className="font-mono text-link"
-                        title={holder.holderAddress}
-                        onClick={() => void copyAddress(holder.holderAddress)}
-                      >
-                        {copied === holder.holderAddress
-                          ? 'Copied'
-                          : shorten(holder.holderAddress, 8, 6)}
-                      </button>
+                      <CopyText value={holder.holderAddress} left={8} right={6} />
                     </td>
                     <td className="px-4 py-3 text-right font-mono tabular-nums">
                       {formatRaw(holder.balanceRaw, data.decimals)} {symbol}
@@ -115,32 +99,8 @@ export function HoldersView({ selection }: { selection: ChainTokenSelection }) {
         </section>
       )}
       <p className="mt-3 text-xs text-muted">
-        Ranked from indexed balances after each processed Transfer. Zero balances are omitted. Click an
-        address to copy it.
+        Ranked from indexed balances after each processed Transfer. Zero balances are omitted.
       </p>
     </div>
   );
-}
-
-function writeClipboard(address: string): Promise<boolean> {
-  if (navigator.clipboard?.writeText) {
-    return navigator.clipboard.writeText(address).then(
-      () => true,
-      () => writeClipboardFallback(address),
-    );
-  }
-  return Promise.resolve(writeClipboardFallback(address));
-}
-
-function writeClipboardFallback(address: string): boolean {
-  const input = document.createElement('textarea');
-  input.value = address;
-  input.setAttribute('readonly', '');
-  input.style.position = 'fixed';
-  input.style.left = '-9999px';
-  document.body.appendChild(input);
-  input.select();
-  const ok = document.execCommand('copy');
-  document.body.removeChild(input);
-  return ok;
 }

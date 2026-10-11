@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { ChainSelect, TokenSelect } from '../components/ChainTokenSelects';
+import { CopyText } from '../components/CopyText';
 import { Alert, Badge, Card, Kv } from '../components/ui';
 import { api, type SyncStatusDto } from '../lib/api';
-import { formatBlock, formatPercent, formatTimestamp, shorten } from '../lib/format';
+import { formatBlock, formatPercent, formatTimestamp } from '../lib/format';
 import type { ChainTokenSelection } from '../lib/useChainTokenSelection';
 
 export function SyncView({ selection }: { selection: ChainTokenSelection }) {
@@ -81,8 +82,8 @@ export function SyncView({ selection }: { selection: ChainTokenSelection }) {
             rows={[
               [
                 'Token',
-                <span className="font-mono text-[13px]">
-                  {shorten(status.tokenAddress, 10, 6)}
+                <span className="text-[13px]">
+                  <CopyText value={status.tokenAddress} left={10} right={6} />
                   {chainLabel ? ` · ${chainLabel}` : ` · chain ${status.chainId}`}
                 </span>,
               ],
@@ -96,9 +97,14 @@ export function SyncView({ selection }: { selection: ChainTokenSelection }) {
               ],
               [
                 'Last block hash',
-                <span className="break-all font-mono text-[12px]">
-                  {status.lastBlockHash ?? '—'}
-                </span>,
+                status.lastBlockHash ? (
+                  <CopyText
+                    value={status.lastBlockHash}
+                    className="break-all text-left text-[12px]"
+                  />
+                ) : (
+                  '—'
+                ),
               ],
               [
                 'Chain head',

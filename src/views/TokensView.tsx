@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ChainSelect } from '../components/ChainTokenSelects';
+import { CopyText } from '../components/CopyText';
 import { Alert, Badge, Card, Kv } from '../components/ui';
 import { api, type TokenDto, tokenKey } from '../lib/api';
-import { shorten } from '../lib/format';
 import type { ChainTokenSelection } from '../lib/useChainTokenSelection';
 
 export function TokensView({ selection }: { selection: ChainTokenSelection }) {
@@ -52,16 +52,21 @@ export function TokensView({ selection }: { selection: ChainTokenSelection }) {
               const active = key === tokenKeyValue;
               return (
                 <li key={key} className="border-b border-line last:border-b-0">
-                  <button
-                    type="button"
-                    onClick={() => setTokenKeyValue(key)}
-                    className={`w-full px-[18px] py-3 text-left ${active ? 'bg-slate-50' : ''}`}
-                  >
-                    <div className="font-semibold">{token.symbol ?? 'TOKEN'}</div>
-                    <div className="font-mono text-xs text-muted">
-                      {shorten(token.tokenAddress, 8, 6)}
-                    </div>
-                  </button>
+                  <div className={`px-[18px] py-3 ${active ? 'bg-slate-50' : ''}`}>
+                    <button
+                      type="button"
+                      onClick={() => setTokenKeyValue(key)}
+                      className="w-full text-left font-semibold"
+                    >
+                      {token.symbol ?? 'TOKEN'}
+                    </button>
+                    <CopyText
+                      value={token.tokenAddress}
+                      left={8}
+                      right={6}
+                      className="text-xs"
+                    />
+                  </div>
                 </li>
               );
             })}
@@ -80,7 +85,7 @@ export function TokensView({ selection }: { selection: ChainTokenSelection }) {
                 ['Chain', chainLabel],
                 [
                   'Address',
-                  <span className="font-mono text-[13px]">{detail.tokenAddress}</span>,
+                  <CopyText value={detail.tokenAddress} className="break-all text-left text-[13px]" />,
                 ],
                 ['Decimals', detail.decimals ?? '—'],
                 [
